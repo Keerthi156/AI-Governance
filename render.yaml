@@ -1,13 +1,15 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
 # Portfolio deploy: FastAPI backend → Render; pair with Neon DB + Vercel frontend.
 #
-# After connecting this repo in Render Dashboard → New → Blueprint:
-# 1. Set secret env vars in the dashboard (DATABASE_URL, JWT_SECRET_KEY, etc.).
-# 2. Deploy the web service.
+# IMPORTANT — Start Command must migrate before Uvicorn.
+# If you created the service manually (not from this Blueprint), set Start Command in
+# the Render Dashboard to the same startCommand below, then Manual Deploy.
+#
+# After connect:
+# 1. Set secret env vars (DATABASE_URL, JWT_SECRET_KEY, CORS_ORIGINS, …).
+# 2. Deploy / sync Blueprint.
 # 3. Point Vercel NEXT_PUBLIC_API_BASE_URL at this service URL.
 # 4. Set CORS_ORIGINS to your Vercel origin(s).
-#
-# Native Python (not Docker) so free-tier start uses $PORT and runs migrations.
 
 services:
   - type: web
@@ -16,7 +18,9 @@ services:
     plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt
-    startCommand: sh scripts/start-prod.sh
+    # Inline migrate+serve so tables exist even if the shell script is skipped.
+    # start-prod.sh is equivalent and preferred when using the script path.
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/v1/health
     envVars:
       - key: APP_ENV

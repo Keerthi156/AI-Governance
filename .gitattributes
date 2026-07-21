@@ -1,0 +1,5 @@
+# Normalize shell scripts to LF so Render/Linux can execute them.
+*.sh text eol=lf
+backend/scripts/docker-entrypoint.sh text eol=lf
+backend/scripts/start-prod.sh text eol=lf
+scripts/*.sh text eol=lf

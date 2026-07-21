@@ -62,9 +62,16 @@ Do **not** commit secrets. Configure them only in Neon / Render / Vercel dashboa
    | `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GOOGLE_API_KEY` / `GROQ_API_KEY` | Optional provider keys |
    | `CREDENTIAL_ENCRYPTION_KEY` | Optional; defaults to JWT secret if empty |
 
-4. Deploy. Start command runs [`backend/scripts/start-prod.sh`](../backend/scripts/start-prod.sh):
-   - `alembic upgrade head`
-   - `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. Deploy. The Start Command **must** run migrations before Uvicorn:
+
+   ```bash
+   alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+   ```
+
+   Equivalent helper: [`backend/scripts/start-prod.sh`](../backend/scripts/start-prod.sh).
+
+   Without this step, Neon has no tables and you will see  
+   `relation "organizations" does not exist`.
 
 ### Option B — Manual Web Service
 
@@ -73,8 +80,10 @@ Do **not** commit secrets. Configure them only in Neon / Render / Vercel dashboa
 | Root Directory | `backend` |
 | Runtime | Python **3.12** (pinned via `backend/.python-version`, `backend/runtime.txt`, and `PYTHON_VERSION`) |
 | Build Command | `pip install -r requirements.txt` |
-| Start Command | `sh scripts/start-prod.sh` |
+| Start Command | **`alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`** |
 | Health Check Path | `/api/v1/health` |
+
+> **If you already created the service** with a uvicorn-only Start Command, Neon will have **no tables** (`relation "organizations" does not exist`). Update **Settings → Start Command** to the value above (or `sh scripts/start-prod.sh`), then **Manual Deploy**.
 
 Same env vars as above. Also set:
 
@@ -210,6 +219,7 @@ sh scripts/start-prod.sh
 | Vercel UI loads but API fails / CORS errors | `CORS_ORIGINS` missing Vercel origin, or wrong URL |
 | UI calls `localhost:8000` | `NEXT_PUBLIC_API_BASE_URL` not set at **build** time — set and redeploy |
 | `/ready` DB error | Bad `DATABASE_URL`, missing `sslmode=require`, or Neon paused |
+| `relation "organizations" does not exist` | Migrations never ran — set Start Command to `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT` and redeploy |
 | Migrate fails on `vector` | Enable pgvector / `CREATE EXTENSION vector` on Neon |
 | First request timeout | Render free-tier cold start — retry once |
 | Unstyled local UI | Delete `frontend/.next` and restart `npm run dev` |
