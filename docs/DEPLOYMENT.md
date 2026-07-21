@@ -71,7 +71,7 @@ Do **not** commit secrets. Configure them only in Neon / Render / Vercel dashboa
 | Setting | Value |
 |---------|--------|
 | Root Directory | `backend` |
-| Runtime | Python 3.12 |
+| Runtime | Python **3.12** (pinned via `backend/.python-version`, `backend/runtime.txt`, and `PYTHON_VERSION`) |
 | Build Command | `pip install -r requirements.txt` |
 | Start Command | `sh scripts/start-prod.sh` |
 | Health Check Path | `/api/v1/health` |

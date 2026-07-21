@@ -63,7 +63,10 @@ htmlcov/
 .tox/
 *.log
 logs/
-.python-version
+# Allow Python version pins for Render/Heroku (do not ignore these).
+!.python-version
+!**/.python-version
+.python-version.bak
 
 # =========================
 # Node / Frontend
