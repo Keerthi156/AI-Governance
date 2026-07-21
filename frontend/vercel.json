@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "installCommand": "npm ci",
+  "installCommand": "npm ci && node -e \"const v=require('next/package.json').version; console.log('Installed next@'+v); if(v!=='15.5.20'){console.error('Expected next@15.5.20'); process.exit(1)}\"",
   "buildCommand": "npm run build",
   "regions": ["iad1"]
 }
