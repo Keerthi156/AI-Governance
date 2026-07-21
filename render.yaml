@@ -1,0 +1,46 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Portfolio deploy: FastAPI backend → Render; pair with Neon DB + Vercel frontend.
+#
+# After connecting this repo in Render Dashboard → New → Blueprint:
+# 1. Set secret env vars in the dashboard (DATABASE_URL, JWT_SECRET_KEY, etc.).
+# 2. Deploy the web service.
+# 3. Point Vercel NEXT_PUBLIC_API_BASE_URL at this service URL.
+# 4. Set CORS_ORIGINS to your Vercel origin(s).
+#
+# Native Python (not Docker) so free-tier start uses $PORT and runs migrations.
+
+services:
+  - type: web
+    name: ai-governance-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: sh scripts/start-prod.sh
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: API_V1_PREFIX
+        value: /api/v1
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      # Set these in the Render dashboard (do not commit real values).
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CREDENTIAL_ENCRYPTION_KEY
+        sync: false

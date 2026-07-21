@@ -76,3 +76,12 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 - Health: http://localhost:8000/api/v1/health
 - Docs: http://localhost:8000/docs
+
+## Production start (Render / containers)
+
+```bash
+# From backend/ — runs alembic upgrade head, then uvicorn on ${PORT:-8000}
+sh scripts/start-prod.sh
+```
+
+See [`docs/DEPLOYMENT.md`](../docs/DEPLOYMENT.md) for Neon + Render + Vercel.
