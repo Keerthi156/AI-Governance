@@ -1,19 +1,35 @@
+# AI_GOVERNANCE backend dependencies (Python 3.12)
+# Keep this list complete for Render/Docker — include EmailStr and RAG extras.
+
+# Web / API
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+starlette==0.41.3
+httpx==0.28.1
+
+# Settings / validation
 pydantic==2.10.4
 pydantic-settings==2.7.0
+email-validator==2.2.0
 python-dotenv==1.0.1
+
+# Database
 sqlalchemy==2.0.36
 psycopg2-binary==2.9.10
 pgvector==0.3.6
 alembic==1.14.0
-openai==1.58.1
-anthropic==0.42.0
-httpx==0.28.1
-python-multipart==0.0.20
+
+# Auth / crypto
 python-jose[cryptography]==3.3.0
 cryptography==44.0.0
 passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
+
+# LLM providers
+openai==1.58.1
+anthropic==0.42.0
+
+# Document ingest (RAG uploads)
 pypdf==5.1.0
 python-docx==1.1.2
