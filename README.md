@@ -167,11 +167,3 @@ WEBHOOK_RETRY_BASE_SECONDS=30
 WEBHOOK_RETRY_WORKER_ENABLED=true
 WEBHOOK_RETRY_WORKER_INTERVAL_SECONDS=15
 ```
-
----
-
-## Project status
-
-**Current milestone:** Org invites, spend soft-warn, refresh tokens
-
-**Roadmap:** Core phases 1–6 complete. Confirm the next enhancement when ready.
