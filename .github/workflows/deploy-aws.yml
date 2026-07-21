@@ -1,0 +1,76 @@
+name: Deploy AWS
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to push (default latest)"
+        required: false
+        default: "latest"
+
+jobs:
+  deploy:
+    name: Build, push ECR, roll ECS
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # required for OIDC
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        if: ${{ vars.AWS_DEPLOY_ROLE_ARN != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || secrets.AWS_REGION }}
+          role-session-name: github-deploy-${{ github.run_id }}
+
+      # Legacy fallback — prefer OIDC; remove keys once role is configured.
+      - name: Configure AWS credentials (access keys)
+        if: ${{ vars.AWS_DEPLOY_ROLE_ARN == '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push backend
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          REPO: ${{ secrets.ECR_BACKEND_REPO }}
+          TAG: ${{ github.event.inputs.image_tag }}
+        run: |
+          docker build -t "$REPO:$TAG" -t "$REPO:latest" ./backend
+          docker push "$REPO:$TAG"
+          docker push "$REPO:latest"
+
+      - name: Build & push frontend
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          REPO: ${{ secrets.ECR_FRONTEND_REPO }}
+          TAG: ${{ github.event.inputs.image_tag }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+        run: |
+          docker build \
+            --build-arg "NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL" \
+            -t "$REPO:$TAG" -t "$REPO:latest" \
+            ./frontend
+          docker push "$REPO:$TAG"
+          docker push "$REPO:latest"
+
+      - name: Force ECS redeploy
+        env:
+          CLUSTER: ${{ secrets.ECS_CLUSTER }}
+          BACKEND_SERVICE: ${{ secrets.ECS_BACKEND_SERVICE }}
+          FRONTEND_SERVICE: ${{ secrets.ECS_FRONTEND_SERVICE }}
+          REGION: ${{ vars.AWS_REGION || secrets.AWS_REGION }}
+        run: |
+          aws ecs update-service --cluster "$CLUSTER" --service "$BACKEND_SERVICE" --force-new-deployment --region "$REGION"
+          aws ecs update-service --cluster "$CLUSTER" --service "$FRONTEND_SERVICE" --force-new-deployment --region "$REGION"
+          echo "Redeploy triggered. Watch ECS console / CloudWatch logs for health."

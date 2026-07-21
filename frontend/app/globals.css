@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --accent: #3b82f6;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #334155;
+  --sidebar-border: #e2e8f0;
+  --sidebar-active: #eff6ff;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --border: #334155;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --accent: #3b82f6;
+  --sidebar: #0f172a;
+  --sidebar-foreground: #cbd5e1;
+  --sidebar-border: #334155;
+  --sidebar-active: #1e3a5f;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply h-full scroll-smooth;
+  }
+
+  body {
+    @apply min-h-full bg-background font-sans text-foreground antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+}
+
+@layer components {
+  /* Normalize legacy panel chrome inside the SaaS shell */
+  .feature-host > section {
+    @apply mx-0 w-full max-w-none animate-fade-in rounded-2xl border border-border bg-card p-5 shadow-card sm:p-6;
+  }
+
+  .feature-host > section > div:first-child h2,
+  .feature-host > section h2:first-child {
+    @apply text-base font-semibold normal-case tracking-tight text-foreground;
+  }
+
+  .feature-host input,
+  .feature-host select,
+  .feature-host textarea {
+    @apply rounded-lg border-border bg-card text-foreground transition;
+  }
+
+  .feature-host button {
+    @apply rounded-lg transition;
+  }
+
+  .feature-host .border-zinc-100,
+  .feature-host .border-zinc-200 {
+    @apply border-border;
+  }
+
+  .feature-host .bg-zinc-50 {
+    @apply bg-muted;
+  }
+
+  .feature-host .bg-white {
+    @apply bg-card;
+  }
+
+  .feature-host .text-zinc-500,
+  .feature-host .text-zinc-600 {
+    @apply text-muted-foreground;
+  }
+
+  .feature-host .text-zinc-700,
+  .feature-host .text-zinc-800,
+  .feature-host .text-zinc-900 {
+    @apply text-foreground;
+  }
+
+  .feature-host .border-zinc-900.bg-zinc-900,
+  .feature-host .bg-zinc-900 {
+    @apply border-primary bg-primary text-primary-foreground hover:bg-accent;
+  }
+
+  .feature-host .hover\:bg-zinc-50:hover {
+    @apply hover:bg-muted;
+  }
+
+  .feature-host .hover\:bg-zinc-800:hover {
+    @apply hover:bg-accent;
+  }
+}

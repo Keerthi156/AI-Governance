@@ -1,0 +1,7 @@
+# Bootstrap keeps its own local state (intentionally).
+*.tfvars
+!terraform.tfvars.example
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log

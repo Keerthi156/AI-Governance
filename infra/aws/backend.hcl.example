@@ -1,0 +1,13 @@
+# Copy to backend.hcl (gitignored) after bootstrap apply.
+# Values must match: terraform -chdir=bootstrap output
+#
+#   cp backend.hcl.example backend.hcl
+#   # edit bucket / table from bootstrap outputs
+#   # uncomment backend "s3" in versions.tf
+#   terraform init -migrate-state -backend-config=backend.hcl
+
+bucket         = "ai-gov-tfstate-ACCOUNT_ID"
+key            = "prod/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "ai-gov-terraform-locks"
+encrypt        = true
